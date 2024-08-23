@@ -35,7 +35,7 @@ export const animationGlitchOnHover = () => {
         clone1.style.visibility = 'visible';
         clone2.style.visibility = 'visible';
 
-        const jumps = 7;
+        const jumps = 5;
         const interval = 80;
         let jumpCount = 0;
 
