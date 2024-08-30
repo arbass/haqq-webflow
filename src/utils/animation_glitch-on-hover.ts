@@ -5,8 +5,19 @@ export const animationGlitchOnHover = () => {
     all_animationGlitchOnHover.forEach((hoverElement) => {
       const glitchElement = hoverElement.querySelector('[data-glitch]');
 
+      // Check if the glitch element exists
+      if (!glitchElement) {
+        console.warn('Glitch element not found for:', hoverElement);
+        return;
+      }
+
       const clone1 = glitchElement.cloneNode(true);
       const clone2 = glitchElement.cloneNode(true);
+
+      if (!clone1 || !clone2) {
+        console.warn('Cloning glitch element failed for:', glitchElement);
+        return;
+      }
 
       clone1.classList.add('glitch-clone');
       clone2.classList.add('glitch-clone');
@@ -71,5 +82,7 @@ export const animationGlitchOnHover = () => {
         glitchElement.style.opacity = 1;
       });
     });
+  } else {
+    console.warn('No elements found with [data-hover] selector');
   }
 };
