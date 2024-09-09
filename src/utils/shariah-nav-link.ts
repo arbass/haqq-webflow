@@ -2,6 +2,7 @@ export const toc_func = () => {
   const triggers = document.querySelectorAll('[shariah-nav-link="trigger"]');
   const listParent = document.querySelector('[shariah-nav-link="list"]');
   const template = document.querySelector('[shariah-nav-link="item"]');
+  const dropdownTitle = document.querySelector('[shariah-nav-link="dropdown-title"]');
 
   let clickedLink = null;
   let lastActiveIndex = -1;
@@ -66,6 +67,9 @@ export const toc_func = () => {
       links.forEach((link, index) => {
         if (index === lastActiveIndex && clickedLink === null) {
           link.classList.add('is-active');
+          if (dropdownTitle) {
+            dropdownTitle.textContent = link.querySelector('.shariah-nav-link_text').textContent;
+          }
         } else if (clickedLink === null) {
           link.classList.remove('is-active');
         }
@@ -105,6 +109,10 @@ export const toc_func = () => {
         links.forEach((l) => l.classList.remove('is-active'));
         link.classList.add('is-active');
         clickedLink = link;
+
+        if (dropdownTitle) {
+          dropdownTitle.textContent = link.querySelector('.shariah-nav-link_text').textContent;
+        }
 
         const targetId = link.getAttribute('href').substring(1);
         const targetElement = document.getElementById(targetId);
