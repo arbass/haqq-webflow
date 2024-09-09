@@ -4,8 +4,9 @@ export const toc_func = () => {
   const template = document.querySelector('[shariah-nav-link="item"]');
 
   let clickedLink = null;
-  let isScrolling = false;
   let lastActiveIndex = -1;
+  let isAutoScrolling = false;
+  let scrollTimeout;
 
   if (listParent && template) {
     template.remove();
@@ -29,7 +30,7 @@ export const toc_func = () => {
     });
 
     const updateActiveLink = () => {
-      if (isScrolling || clickedLink) return;
+      if (isAutoScrolling) return;
 
       let closestIndex = -1;
       let closestDistance = Infinity;
@@ -51,39 +52,59 @@ export const toc_func = () => {
       }
 
       links.forEach((link, index) => {
-        if (index === lastActiveIndex) {
+        if (index === lastActiveIndex && clickedLink === null) {
           link.classList.add('is-active');
-        } else {
+        } else if (clickedLink === null) {
           link.classList.remove('is-active');
         }
       });
     };
 
-    let scrollTimeout;
+    const stopAutoScrolling = () => {
+      clearTimeout(scrollTimeout);
+      isAutoScrolling = false;
+      clickedLink = null;
+      updateActiveLink();
+    };
 
     window.addEventListener('scroll', () => {
-      if (clickedLink) return;
-
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
-      }
-
-      isScrolling = true;
-      scrollTimeout = setTimeout(() => {
-        isScrolling = false;
+      if (!clickedLink && !isAutoScrolling) {
         updateActiveLink();
-      }, 50);
+      }
+    });
+
+    window.addEventListener('wheel', () => {
+      if (isAutoScrolling) {
+        clearTimeout(scrollTimeout);
+        stopAutoScrolling();
+      }
+    });
+
+    window.addEventListener('touchstart', () => {
+      if (isAutoScrolling) {
+        clearTimeout(scrollTimeout);
+        stopAutoScrolling();
+      }
     });
 
     links.forEach((link) => {
       link.addEventListener('click', (e) => {
+        e.preventDefault();
         links.forEach((l) => l.classList.remove('is-active'));
         link.classList.add('is-active');
         clickedLink = link;
 
-        setTimeout(() => {
-          clickedLink = null;
-        }, 25);
+        const targetId = link.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          isAutoScrolling = true;
+          targetElement.scrollIntoView({ behavior: 'smooth' });
+
+          scrollTimeout = setTimeout(() => {
+            stopAutoScrolling();
+            clickedLink.classList.add('is-active');
+          }, 2000);
+        }
       });
     });
 
