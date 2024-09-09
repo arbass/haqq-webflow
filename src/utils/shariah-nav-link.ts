@@ -7,6 +7,7 @@ export const toc_func = () => {
   let lastActiveIndex = -1;
   let isAutoScrolling = false;
   let scrollTimeout;
+  const offset = 10 * parseFloat(getComputedStyle(document.documentElement).fontSize);
 
   if (listParent && template) {
     template.remove();
@@ -14,6 +15,17 @@ export const toc_func = () => {
     const links = [];
 
     triggers.forEach((trigger) => {
+      const anchor = document.createElement('div');
+      anchor.style.position = 'absolute';
+      anchor.style.height = '1px';
+      anchor.style.width = '1px';
+      anchor.style.top = `${trigger.offsetTop - offset}px`;
+      anchor.setAttribute(
+        'id',
+        `anchor-${trigger.textContent.trim().toLowerCase().replace(/\s+/g, '-')}`
+      );
+      document.body.appendChild(anchor);
+
       const newLink = template.cloneNode(true);
       newLink.classList.remove('is-active');
       const linkText = newLink.querySelector('.shariah-nav-link_text');
@@ -21,7 +33,7 @@ export const toc_func = () => {
       if (linkText) {
         linkText.textContent = trigger.textContent;
         const formattedText = trigger.textContent.trim().toLowerCase().replace(/\s+/g, '-');
-        newLink.setAttribute('href', `#${formattedText}`);
+        newLink.setAttribute('href', `#anchor-${formattedText}`);
         trigger.setAttribute('id', formattedText);
       }
 
@@ -98,12 +110,13 @@ export const toc_func = () => {
         const targetElement = document.getElementById(targetId);
         if (targetElement) {
           isAutoScrolling = true;
+
           targetElement.scrollIntoView({ behavior: 'smooth' });
 
           scrollTimeout = setTimeout(() => {
             stopAutoScrolling();
             clickedLink.classList.add('is-active');
-          }, 2000);
+          }, 3000);
         }
       });
     });
