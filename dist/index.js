@@ -3,6 +3,42 @@
   // bin/live-reload.js
   new EventSource(`${"http://localhost:3000"}/esbuild`).addEventListener("change", () => location.reload());
 
+  // src/utils/academy-page_func.ts
+  var academyPage_func = () => {
+    const grids = Array.from(document.querySelectorAll("[academy-modules_item-grid-slug]"));
+    const cards = Array.from(document.querySelectorAll("[cli_academy-modules_item-grid-slug]"));
+    const cardsBySlug = {};
+    cards.forEach((card) => {
+      const slug = card.getAttribute("cli_academy-modules_item-grid-slug");
+      if (!cardsBySlug[slug]) {
+        cardsBySlug[slug] = [];
+      }
+      cardsBySlug[slug].push(card);
+    });
+    grids.forEach((grid) => {
+      const slug = grid.getAttribute("academy-modules_item-grid-slug");
+      const matchingCards = cardsBySlug[slug];
+      if (matchingCards) {
+        matchingCards.forEach((card) => {
+          grid.appendChild(card);
+        });
+      }
+    });
+    const countElement = document.querySelector("[count-of-lesson-cards]");
+    if (countElement) {
+      countElement.textContent = cards.length;
+    }
+    const durationElements = Array.from(document.querySelectorAll("[current-duration]"));
+    const totalDuration = durationElements.reduce((sum, elem) => {
+      const value = parseFloat(elem.getAttribute("current-duration"));
+      return sum + (isNaN(value) ? 0 : value);
+    }, 0);
+    const durationSumElement = document.querySelector("[summary-of-durations]");
+    if (durationSumElement) {
+      durationSumElement.textContent = totalDuration;
+    }
+  };
+
   // src/utils/animation_scramble-text-on-scroll.ts
   var typeTextOnScroll = () => {
     const elements = document.querySelectorAll("[data-animate-visibility]");
@@ -51,6 +87,113 @@
     window.addEventListener("scroll", onScroll);
     window.addEventListener("load", onScroll);
     window.addEventListener("resize", resetAnimationsOnResize);
+  };
+
+  // src/utils/buttons-brand_func.ts
+  var buttonsBrand_func = () => {
+    const buttons = document.querySelectorAll("[copy-to-clipboard]");
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const textToCopy = button.getAttribute("copy-to-clipboard");
+        const originalText = button.textContent;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          button.textContent = "copied";
+          setTimeout(() => {
+            button.textContent = originalText;
+          }, 2e3);
+        }).catch((err) => {
+          console.error("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0442\u0435\u043A\u0441\u0442: ", err);
+        });
+      });
+    });
+  };
+
+  // src/utils/card-hover-on-scroll.ts
+  var cardHoverOnScroll_func = () => {
+    if (window.innerWidth <= 767) {
+      const elements = document.querySelectorAll(".card-hover-on-scroll");
+      if (elements.length) {
+        let ticking = false;
+        const updateElements = () => {
+          const viewportHeight = window.innerHeight;
+          const viewportCenter = viewportHeight / 2;
+          let minDistance = Infinity;
+          let closestElement = null;
+          elements.forEach((element) => {
+            const rect = element.getBoundingClientRect();
+            const elementCenter = rect.top + rect.height / 2;
+            const distance = Math.abs(elementCenter - viewportCenter);
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestElement = element;
+            }
+          });
+          elements.forEach((element) => {
+            const item = element.querySelector(".card-hover-on-scroll_item");
+            if (item) {
+              if (element === closestElement) {
+                item.style.opacity = "1";
+              } else {
+                item.style.opacity = "0";
+              }
+            }
+          });
+        };
+        const handleScroll = () => {
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              updateElements();
+              ticking = false;
+            });
+            ticking = true;
+          }
+        };
+        window.addEventListener("scroll", handleScroll);
+        updateElements();
+      }
+    }
+  };
+
+  // src/utils/card-hover-on-scroll-roadmap.ts
+  var cardHoverOnScrollRoadmap_func = () => {
+    const elements = document.querySelectorAll(".roadmap_item");
+    if (elements.length) {
+      let ticking = false;
+      const updateElements = () => {
+        const viewportHeight = window.innerHeight;
+        const viewportCenter = viewportHeight / 2;
+        let minDistance = Infinity;
+        let closestElement = null;
+        elements.forEach((element) => {
+          const rect = element.getBoundingClientRect();
+          const elementCenter = rect.top + rect.height / 2;
+          const distance = Math.abs(elementCenter - viewportCenter);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestElement = element;
+          }
+        });
+        elements.forEach((element) => {
+          if (element === closestElement) {
+            element.style.opacity = "1";
+          } else {
+            element.style.opacity = "0.4";
+          }
+        });
+      };
+      const handleScroll = () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            updateElements();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      };
+      window.addEventListener("scroll", handleScroll);
+      window.addEventListener("resize", handleScroll);
+      updateElements();
+    }
   };
 
   // src/utils/dropdown-tab-master_func.ts
@@ -395,6 +538,10 @@
     profilePopups_func();
     toc_func();
     tabsMainProgress_func();
+    cardHoverOnScroll_func();
+    cardHoverOnScrollRoadmap_func();
+    buttonsBrand_func();
+    academyPage_func();
   });
 })();
 //# sourceMappingURL=index.js.map
