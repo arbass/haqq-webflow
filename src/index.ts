@@ -7,6 +7,7 @@ import { dropdownTabMaster_func } from '$utils/dropdown-tab-master_func';
 import { profilePopups_func } from '$utils/profile-popups';
 import { toc_func } from '$utils/shariah-nav-link';
 import { tabsMainProgress_func } from '$utils/tabs-main-progress';
+// import { kopytokToolCmsEasy } from '$utils/webflow_kopytok-tool-cms-easy';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
@@ -19,4 +20,5 @@ window.Webflow.push(() => {
   cardHoverOnScrollRoadmap_func();
   buttonsBrand_func();
   academyPage_func();
+  // kopytokToolCmsEasy();
 });
