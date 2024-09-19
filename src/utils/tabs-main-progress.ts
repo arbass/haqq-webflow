@@ -29,9 +29,6 @@ export const tabsMainProgress_func = () => {
       if (state.timer) {
         clearTimeout(state.timer);
       }
-      if (state.innerObserver) {
-        state.innerObserver.disconnect();
-      }
       if (state.eventListeners) {
         state.eventListeners.forEach(({ element, handler }) => {
           element.removeEventListener('click', handler);
@@ -47,50 +44,25 @@ export const tabsMainProgress_func = () => {
 
       const eventListeners = [];
       logosItemsArray.forEach((item, index) => {
-        const clickHandler = () => {
+        const clickHandler = (event) => {
+          if (event) event.preventDefault();
+
           const state = tabPaneStates.get(tabPane);
           if (state && state.timer) {
             clearTimeout(state.timer);
           }
 
-          logosItemsArray.forEach((it) => {
-            it.classList.remove('w--current');
-          });
-          item.classList.add('w--current');
-
-          startProgressBar(tabPane, innerTabProgress, logosItemsArray, index);
+          switchToTab(tabPane, innerTabProgress, logosItemsArray, index);
         };
 
         item.addEventListener('click', clickHandler);
         eventListeners.push({ element: item, handler: clickHandler });
       });
 
-      const innerObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-            const { target } = mutation;
-            if (target.classList.contains('w--current')) {
-              const newIndex = logosItemsArray.indexOf(target);
-
-              const state = tabPaneStates.get(tabPane);
-              if (state && state.timer) {
-                clearTimeout(state.timer);
-              }
-
-              startProgressBar(tabPane, innerTabProgress, logosItemsArray, newIndex);
-            }
-          }
-        });
-      });
-
-      logosItemsArray.forEach((item) => {
-        innerObserver.observe(item, { attributes: true });
-      });
-
-      tabPaneStates.set(tabPane, { innerObserver, eventListeners });
+      tabPaneStates.set(tabPane, { eventListeners });
 
       if (logosItemsArray.length > 0) {
-        logosItemsArray[0].click();
+        switchToTab(tabPane, innerTabProgress, logosItemsArray, 0);
       }
     }
   }
@@ -100,9 +72,6 @@ export const tabsMainProgress_func = () => {
     if (state) {
       if (state.timer) {
         clearTimeout(state.timer);
-      }
-      if (state.innerObserver) {
-        state.innerObserver.disconnect();
       }
       if (state.eventListeners) {
         state.eventListeners.forEach(({ element, handler }) => {
@@ -148,12 +117,43 @@ export const tabsMainProgress_func = () => {
           nextIndex = 0;
         }
 
-        logosItemsArray[nextIndex].click();
+        // Переходим к следующей вкладке программно
+        switchToTab(tabPane, innerTabProgress, logosItemsArray, nextIndex);
       }, 5000);
 
       const state = tabPaneStates.get(tabPane) || {};
       state.timer = timer;
       tabPaneStates.set(tabPane, state);
     }
+  }
+
+  function switchToTab(tabPane, innerTabProgress, logosItemsArray, index) {
+    // Убираем 'w--current' со всех вкладок
+    logosItemsArray.forEach((item) => {
+      item.classList.remove('w--current');
+    });
+    // Добавляем 'w--current' к текущей вкладке
+    const currentItem = logosItemsArray[index];
+    currentItem.classList.add('w--current');
+
+    // Переключаем содержимое вкладки
+    const tabContent = tabPane.querySelector('.tabs-content-4.w-tab-content');
+    const tabPanes = tabContent.querySelectorAll('.w-tab-pane');
+
+    tabPanes.forEach((pane) => {
+      pane.classList.remove('w--tab-active');
+      pane.style.opacity = '';
+      pane.style.transition = '';
+    });
+
+    const targetTabPane = tabPanes[index];
+    if (targetTabPane) {
+      targetTabPane.classList.add('w--tab-active');
+      targetTabPane.style.opacity = '1';
+      targetTabPane.style.transition = 'opacity 300ms';
+    }
+
+    // Запускаем прогресс-бар для новой вкладки
+    startProgressBar(tabPane, innerTabProgress, logosItemsArray, index);
   }
 };
