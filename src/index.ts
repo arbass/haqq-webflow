@@ -10,7 +10,6 @@ import { profilePopups_func } from '$utils/profile-popups';
 import { toc_func } from '$utils/shariah-nav-link';
 import { tabsDebitProgress_func } from '$utils/tabs-debit-progress';
 import { tabsMainProgress_func } from '$utils/tabs-main-progress';
-// import { kopytokToolCmsEasy } from '$utils/webflow_kopytok-tool-cms-easy';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
@@ -26,5 +25,4 @@ window.Webflow.push(() => {
   islmPlatformsCards_func();
   tabsDebitProgress_func();
   ecosystemTabs_func();
-  // kopytokToolCmsEasy();
 });
