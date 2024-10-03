@@ -7,6 +7,7 @@ import { dropdownTabMaster_func } from '$utils/dropdown-tab-master_func';
 import { ecosystemTabs_func } from '$utils/ecosystem-tabs';
 import { islmPlatformsCards_func } from '$utils/islm-platforms-cards_func';
 import { profilePopups_func } from '$utils/profile-popups';
+import { func_removeVideoPlay } from '$utils/remove-video-play';
 import { toc_func } from '$utils/shariah-nav-link';
 import { tabsDebitProgress_func } from '$utils/tabs-debit-progress';
 import { tabsMainProgress_func } from '$utils/tabs-main-progress';
@@ -25,4 +26,5 @@ window.Webflow.push(() => {
   islmPlatformsCards_func();
   tabsDebitProgress_func();
   ecosystemTabs_func();
+  func_removeVideoPlay();
 });
