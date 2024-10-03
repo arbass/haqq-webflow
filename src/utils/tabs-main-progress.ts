@@ -156,4 +156,53 @@ export const tabsMainProgress_func = () => {
     // Запускаем прогресс-бар для новой вкладки
     startProgressBar(tabPane, innerTabProgress, logosItemsArray, index);
   }
+
+  // Новый код для добавления требуемой функциональности
+  // Шаг 1: Добавляем атрибут [current-tab-name=""] к кнопкам
+  const mainTabButtons = document.querySelectorAll('[dropdown-from-a-list_src="tab-button"]');
+
+  mainTabButtons.forEach((tabButton) => {
+    const tabTextElement = tabButton.querySelector('[dropdown-from-a-list_src="tab-text"]');
+    if (tabTextElement) {
+      const tabText = tabTextElement.textContent.trim().toLowerCase();
+      tabButton.setAttribute('current-tab-name', tabText);
+    }
+
+    // Добавляем обработчик клика для обновления хеша в адресной строке
+    tabButton.addEventListener('click', (event) => {
+      const currentTabName = tabButton.getAttribute('current-tab-name');
+      if (currentTabName) {
+        history.replaceState(null, null, '#' + currentTabName);
+      }
+    });
+  });
+
+  // Функция для обработки хеша и переключения табов
+  function handleHashChange() {
+    const hash = window.location.hash.substring(1); // Удаляем символ '#'
+    if (hash) {
+      const targetTabButton = document.querySelector(`[current-tab-name="${hash}"]`);
+      if (targetTabButton) {
+        // Программно кликаем по соответствующей кнопке
+        const clickEvent = new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+        });
+        targetTabButton.dispatchEvent(clickEvent);
+
+        // Прокручиваем страницу к элементу с id="haqq-network"
+        const haqqNetworkElement = document.getElementById('haqq-network');
+        if (haqqNetworkElement) {
+          haqqNetworkElement.scrollIntoView({ behavior: 'instant' });
+        }
+      }
+    }
+  }
+
+  // Шаг 2: Проверяем хеш в адресной строке при загрузке страницы
+  handleHashChange();
+
+  // Шаг 3: Добавляем обработчик события hashchange
+  window.addEventListener('hashchange', handleHashChange);
 };
