@@ -1,7 +1,9 @@
+/* https://chatgpt.com/c/6708efc3-d480-8002-ba27-84c8bde2fadf */
+
 export const dropdownTabMaster_func = () => {
   const dropdownTabMaster_el = document.querySelectorAll('[dropdown-from-a-list_component]');
   if (dropdownTabMaster_el.length) {
-    document.querySelectorAll('[dropdown-from-a-list_component]').forEach((component) => {
+    dropdownTabMaster_el.forEach((component) => {
       const dropdown = component.querySelector('[dropdown-from-a-list="dropdown"]');
       const tabsContainer = component.querySelector('[dropdown-from-a-list_src="list"]');
 
@@ -10,11 +12,12 @@ export const dropdownTabMaster_func = () => {
         tabsContainer.appendChild(dropdown);
 
         const tabsLinks = component.querySelectorAll('[dropdown-from-a-list_src="tab-button"]');
-        const dropdownList = component.querySelector('[dropdown-from-a-list="dropdown"] nav');
+        const dropdownList = dropdown.querySelector('nav');
         const toggleText = component.querySelector('[dropdown-from-a-list_target="toggl-text"]');
         const dropdownToggle = component.querySelector('[dropdown-from-a-list_target="toggle"]');
         const dropdownHighlighter = component.querySelector('.dropdown_highlighter');
         const dropdownMenu = component.querySelector('.dropdown-list.w-dropdown-list');
+        const dropdownIcon = dropdownToggle.querySelector('.dropdown-toggle_icon');
 
         if (
           !tabsLinks.length ||
@@ -22,11 +25,9 @@ export const dropdownTabMaster_func = () => {
           !toggleText ||
           !dropdownToggle ||
           !dropdownHighlighter ||
-          !dropdownMenu
+          !dropdownMenu ||
+          !dropdownIcon
         ) {
-          console.warn(
-            'Одного или нескольких селекторов не хватает для корректной работы скрипта.'
-          );
           return;
         }
 
@@ -46,6 +47,14 @@ export const dropdownTabMaster_func = () => {
             e.preventDefault();
             tabsLinks[index]?.click();
             toggleText.textContent = tabText;
+
+            // Закрываем дропдаун, генерируя событие 'w-close'
+            const closeEvent = new Event('w-close', { bubbles: true });
+            dropdown.dispatchEvent(closeEvent);
+
+            // Обновляем визуальное состояние иконки и highlighter
+            dropdownIcon.style.transform = 'rotate(0deg)';
+            dropdownHighlighter.classList.remove('is-active');
           });
 
           dropdownList.appendChild(listItem);
@@ -54,12 +63,16 @@ export const dropdownTabMaster_func = () => {
         const updateHighlighterState = () => {
           if (dropdownMenu.classList.contains('w--open')) {
             dropdownHighlighter.classList.add('is-active');
+            dropdownIcon.style.transform = 'rotate(180deg)';
           } else {
             dropdownHighlighter.classList.remove('is-active');
+            dropdownIcon.style.transform = 'rotate(0deg)';
           }
         };
 
-        dropdownToggle.addEventListener('click', updateHighlighterState);
+        dropdownToggle.addEventListener('click', () => {
+          updateHighlighterState();
+        });
 
         dropdownToggle.addEventListener('mouseover', () => {
           if (!dropdownMenu.classList.contains('w--open')) {
@@ -83,8 +96,6 @@ export const dropdownTabMaster_func = () => {
             'Active Tab';
           toggleText.textContent = activeTabText;
         }
-      } else {
-        console.warn('Не удалось найти контейнеры для dropdown или табов.');
       }
     });
   }
