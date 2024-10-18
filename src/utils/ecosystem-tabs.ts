@@ -62,6 +62,15 @@ export const ecosystemTabs_func = () => {
         card.classList.add('hide');
       }
     });
+
+    // Обновляем параметр 'tag' в URL
+    const url = new URL(window.location);
+    if (category === 'all') {
+      url.searchParams.delete('tag');
+    } else {
+      url.searchParams.set('tag', category);
+    }
+    window.history.replaceState({}, '', url);
   }
 
   // Добавляем обработчики событий на кнопки табов
@@ -84,4 +93,28 @@ export const ecosystemTabs_func = () => {
       firstTabButton.click();
     }, 0);
   }
+
+  // Добавляем проверку параметра 'tag' в URL
+  (() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tagParam = urlParams.get('tag');
+
+    if (tagParam) {
+      setTimeout(() => {
+        const wrapper = document.querySelector('[ecosystem-catalog]');
+        if (!wrapper) return;
+
+        const tabButtons = wrapper.querySelectorAll('[ecosystem-tab-link-category]');
+
+        const matchingTabButton = Array.from(tabButtons).find((button) => {
+          const category = button.getAttribute('ecosystem-tab-link-category');
+          return category === tagParam;
+        });
+
+        if (matchingTabButton) {
+          matchingTabButton.click();
+        }
+      }, 100);
+    }
+  })();
 };
